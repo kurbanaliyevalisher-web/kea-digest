@@ -1,0 +1,50 @@
+name: КЭА — Еженедельный дайджест энергетики
+
+on:
+  schedule:
+    # Каждое воскресенье в 04:00 UTC = понедельник 09:00 Астана (UTC+5)
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+    # Ручной запуск для тестирования (кнопка в GitHub Actions)
+    inputs:
+      test_mode:
+        description: 'Тестовый запуск (отправит на ваш email)'
+        required: false
+        default: 'false'
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout репозитория
+        uses: actions/checkout@v4
+
+      - name: Настройка Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Установка зависимостей
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Генерация и отправка дайджеста
+        env:
+          GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_USER:          ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD:  ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAILS:    ${{ secrets.RECIPIENT_EMAILS }}
+        run: |
+          python digest.py
+
+      - name: Сохранить PDF как артефакт (для проверки)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ github.run_number }}
+          path: digest_output.pdf
+          retention-days: 30
