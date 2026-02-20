@@ -30,7 +30,7 @@ jobs:
       - name: Установка зависимостей
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r kea_digest_bot/requirements.txt
 
       - name: Генерация и отправка дайджеста
         env:
