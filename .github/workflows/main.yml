@@ -39,7 +39,7 @@ jobs:
           GMAIL_APP_PASSWORD:  ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAILS:    ${{ secrets.RECIPIENT_EMAILS }}
         run: |
-          python digest.py
+          python kea_digest_bot/digest.py
 
       - name: Сохранить PDF как артефакт (для проверки)
         if: always()
